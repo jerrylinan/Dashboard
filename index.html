@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>投资分析 | Spatial Research</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@100;300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@100;300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -345,7 +343,7 @@
         <div class="controls">
             <div>
                 <span class="section-label">Overview</span>
-                <div class="subtitle">Tracking <span id="active-count" style="color:white; font-weight:600;">2</span> active assets in portfolio</div>
+                <div class="subtitle">Tracking <span id="active-count" style="color:white; font-weight:600;">3</span> active assets in portfolio</div>
             </div>
             <button class="btn btn-primary" onclick="window.openModal()">
                 <span style="font-size:1.2em; line-height:0;">+</span> New Analysis
@@ -356,6 +354,22 @@
         
         <!-- Grid 容器 -->
         <div class="grid" id="active-grid">
+                <div class="card-wrapper">
+                    <button class="card-action-btn" onclick="window.archiveCard(this)" title="Archive">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                    </button>
+                    <a href="googl.html" class="card" data-ticker="GOOGL" data-name="Google">
+                        <div class="card-header">
+                            <div class="ticker">GOOGL</div>
+                            <span class="badge new">New</span>
+                        </div>
+                        <div class="name">Google</div>
+                        <div class="card-footer">
+                            <span>STATUS: INIT</span>
+                            <span>NOV 22, 2025</span>
+                        </div>
+                    </a>
+                </div>
             
             <!-- 示例卡片 1: TCOM -->
             <div class="card-wrapper">
@@ -575,5 +589,5 @@
             });
         });
     </script>
-</body>
-</html>
+
+</body></html>
