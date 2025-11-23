@@ -1,85 +1,79 @@
-<html lang="zh-CN"><head>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>投资分析 | Spatial Research</title>
+    <title>Portfolio Console | Industrial Design</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@100;300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Tahoe Concept Palette */
-            --depth-base: #000000;
+            /* --- 1. The Braun Color System --- */
+            --color-chassis: #F4F2E9;       /* 主机身 (Warm Beige) */
+            --color-module: #EAE7DC;        /* 凸起的模块/卡片 */
+            --color-well: #DCD9CE;          /* 凹陷的输入框/仪表盘 */
             
-            /* 玻璃材质 */
-            --glass-material: rgba(20, 20, 25, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-highlight: rgba(255, 255, 255, 0.2);
+            --color-ink: #222222;           /* 丝网印刷文字 (Dark Charcoal) */
+            --color-ink-secondary: #666666; /* 次要文字 */
+            --color-ink-tertiary: #999999;  /* 辅助标签 */
             
-            /* 模拟物理厚度的内阴影 */
-            --crystal-shadow: 
-                inset 0 1px 1px 0 rgba(255, 255, 255, 0.3), 
-                inset 0 -1px 1px 0 rgba(0, 0, 0, 0.5),
-                0 20px 40px -10px rgba(0,0,0,0.8);
+            /* Accents */
+            --color-braun-orange: #FF6B00;  /* 核心交互色 (Power/Action) */
+            --color-braun-green: #3D6B36;   /* 状态：正常 */
+            --color-braun-yellow: #DBAA18;  /* 状态：警告 */
+            
+            /* --- 2. Physics & Lighting (Skeuomorphism 2.0) --- */
+            /* 凸起效果 (Buttons, Cards) */
+            --shadow-raised: 
+                4px 4px 10px rgba(0,0,0,0.08), 
+                inset 1px 1px 0px rgba(255,255,255,0.8);
+            
+            /* 悬浮/按压效果 */
+            --shadow-hover: 
+                6px 6px 15px rgba(0,0,0,0.12), 
+                inset 1px 1px 0px rgba(255,255,255,0.9);
+                
+            /* 凹陷效果 (Inputs, Wells) */
+            --shadow-well: 
+                inset 2px 2px 5px rgba(0,0,0,0.12), 
+                inset -1px -1px 0px rgba(255,255,255,0.6),
+                1px 1px 0px rgba(255,255,255,0.6); /* Bottom lip highlight */
 
-            /* 功能色 - 极光风格 */
-            --aurora-cyan: #00f2ea;
-            --aurora-purple: #7c3aed;
-            --aurora-pink: #ff0080;
-            --aurora-green: #34d399;
-            
-            --text-primary: #ffffff;
-            --text-secondary: rgba(235, 235, 245, 0.6);
-            --text-tertiary: rgba(235, 235, 245, 0.3);
+            /* 物理分割线 (Groove) */
+            --border-groove: 1px solid rgba(0,0,0,0.1);
+            --border-highlight: 1px solid rgba(255,255,255,0.7);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
 
         body {
-            background-color: var(--depth-base);
-            color: var(--text-primary);
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--color-chassis);
+            color: var(--color-ink);
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            /* 关键：全页噪点纹理模拟磨砂塑料 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
         }
 
-        /* --- 1. 动态环境光场 (Ambient Light Field) --- */
-        .ambient-field {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: #000;
-            overflow: hidden;
-            pointer-events: none;
-        }
+        /* 隐藏旧的环境光 */
+        .ambient-field { display: none; }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.4;
-            animation: floatOrb 20s infinite ease-in-out alternate;
-        }
-
-        .orb-1 { width: 60vw; height: 60vw; background: radial-gradient(circle, var(--aurora-purple), transparent 70%); top: -20%; left: -10%; }
-        .orb-2 { width: 50vw; height: 50vw; background: radial-gradient(circle, var(--aurora-cyan), transparent 70%); bottom: -10%; right: -10%; animation-delay: -5s; }
-        .orb-3 { width: 30vw; height: 30vw; background: radial-gradient(circle, var(--aurora-pink), transparent 70%); top: 40%; left: 40%; animation-delay: -10s; opacity: 0.2; }
-
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, -30px) scale(1.05); }
-        }
-
-        /* --- Header --- */
+        /* --- Header: Unibody Design --- */
         header {
-            padding: 2rem 3rem;
+            padding: 2.5rem 3rem;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             z-index: 50;
+            /* 物理分割线代替不同背景色 */
+            border-bottom: var(--border-groove);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.6); /* Highlight under groove */
         }
 
         .brand {
@@ -87,294 +81,352 @@
             flex-direction: column;
         }
 
-        .logo { 
-            font-weight: 200; 
-            font-size: 2rem; 
-            letter-spacing: -0.5px; 
-            color: white; 
-            margin-bottom: 5px;
-            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .section-label { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: var(--color-ink-tertiary); 
+            margin-bottom: 6px;
+            font-weight: 600;
         }
 
+        .logo { 
+            font-weight: 700; 
+            font-size: 1.8rem; 
+            letter-spacing: -0.03em; 
+            color: var(--color-ink); 
+            background: none;
+            -webkit-text-fill-color: initial;
+            text-transform: uppercase;
+        }
+
+        /* Search Box: Recessed Well */
         .search-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 100px; /* Pill shape */
-            padding: 12px 24px;
-            color: white;
+            background: var(--color-well);
+            border: none;
+            border-radius: 8px; /* 较小的圆角，更工业化 */
+            padding: 14px 20px;
+            color: var(--color-ink);
             width: 320px;
-            font-size: 0.95rem;
-            backdrop-filter: blur(20px);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            font-family: 'SF Pro Display', sans-serif;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            /* 凹陷效果 */
+            box-shadow: var(--shadow-well);
+            transition: all 0.2s ease;
         }
         .search-box:focus { 
-            width: 360px; 
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
-            border-color: rgba(255,255,255,0.3);
+            width: 340px; 
+            background: #D4D1C6;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.15);
         }
-        .search-box::placeholder { color: rgba(255,255,255,0.3); }
+        .search-box::placeholder { color: rgba(0,0,0,0.3); font-style: italic; }
 
         /* --- Main Content --- */
-        main { flex: 1; max-width: 1600px; margin: 0 auto; padding: 1rem 3rem 3rem 3rem; width: 100%; position: relative; z-index: 10; }
+        main { flex: 1; max-width: 1600px; margin: 0 auto; padding: 2rem 3rem 4rem 3rem; width: 100%; position: relative; z-index: 10; }
 
         .controls {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem;
             padding-bottom: 20px;
         }
 
-        .section-label { 
-            font-size: 0.8rem; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            color: var(--text-tertiary); 
-            margin-bottom: 5px;
-            display: block;
+        .subtitle { 
+            color: var(--color-ink-secondary); 
+            font-size: 0.95rem; 
+            margin-top: 4px;
         }
+        
+        #active-count { color: var(--color-braun-orange) !important; font-family: 'JetBrains Mono'; }
 
-        .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
-
-        /* --- Crystal Grid System --- */
+        /* --- Crystal Grid -> Modular Grid --- */
         .section-title {
-            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-tertiary);
-            margin: 3rem 0 1.5rem 0; display: flex; align-items: center; gap: 15px; font-weight: 600;
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-ink);
+            margin: 3rem 0 1.5rem 0; display: flex; align-items: center; gap: 15px; font-weight: 700;
         }
-        .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent); }
+        /* 标题线的物理凹槽感 */
+        .section-title::after { 
+            content: ''; flex: 1; height: 1px; 
+            background: rgba(0,0,0,0.1); 
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+        }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
             margin-bottom: 3rem;
         }
 
-        /* --- Tahoe Crystal Card Styling --- */
-        .card-wrapper { position: relative; perspective: 1000px; } 
+        /* --- Card: Physical Module --- */
+        .card-wrapper { position: relative; } 
 
         .card {
-            display: flex; flex-direction: column; height: 220px;
+            display: flex; flex-direction: column; height: 200px;
             position: relative; overflow: hidden;
             text-decoration: none;
             
-            /* Crystal Material */
-            background: var(--glass-material);
-            backdrop-filter: blur(40px) saturate(120%);
-            -webkit-backdrop-filter: blur(40px) saturate(120%);
-            border-radius: 32px;
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--crystal-shadow);
+            /* 哑光塑料材质 */
+            background: var(--color-module);
+            border-radius: 12px; /* 工业圆角 */
+            border: 1px solid #D1CDC0; /* 实体边框 */
             
-            padding: 28px;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+            /* 凸起投影 */
+            box-shadow: var(--shadow-raised);
+            
+            padding: 24px;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* 模拟塑料表面的噪点 */
+        .card::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none; mix-blend-mode: multiply;
         }
 
         .card:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 
-                inset 0 1px 2px 0 rgba(255, 255, 255, 0.4), 
-                inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4),
-                0 30px 60px -12px rgba(0,0,0,0.9),
-                0 0 30px rgba(255, 255, 255, 0.05);
-            border-color: rgba(255,255,255,0.2);
-            z-index: 10;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            border-color: #C0BCAE;
         }
 
-        /* Archive Action Button */
+        /* Archive Button: Recessed Screw/Button */
         .card-action-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 20;
-            width: 36px; height: 36px; border-radius: 50%;
-            background: rgba(0,0,0,0.2); 
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-secondary); 
+            position: absolute; top: 16px; right: 16px; z-index: 20;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--color-chassis); 
+            border: 1px solid rgba(0,0,0,0.05);
+            color: var(--color-ink-tertiary); 
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; opacity: 0; transition: all 0.3s;
-            backdrop-filter: blur(10px);
+            cursor: pointer; opacity: 1; transition: all 0.2s;
+            /* 按钮凹陷感 */
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.1), 1px 1px 0 rgba(255,255,255,0.8);
         }
-        .card-action-btn:hover { background: rgba(255,255,255,0.1); color: white; transform: rotate(90deg); }
-        .card-wrapper:hover .card-action-btn { opacity: 1; } 
+        .card-action-btn:hover { 
+            color: var(--color-braun-orange); 
+            background: #EFECE4;
+            transform: scale(1.1);
+        }
 
         /* Archive Mode Styles */
         .archive-zone .card { 
             opacity: 0.6; 
+            background: #E6E3D8;
             box-shadow: none;
-            background: rgba(255,255,255,0.02);
-            border-style: dashed;
+            border: 1px dashed #CCC;
         }
         .archive-zone .card:hover { opacity: 1; border-style: solid; }
 
         /* Card Internal Layout */
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: auto; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: auto; position: relative; z-index: 2;}
         
         .ticker { 
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem; 
-            font-weight: 300; 
-            color: white; 
-            letter-spacing: -1px;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            font-size: 1.6rem; 
+            font-weight: 700; 
+            color: var(--color-ink); 
+            letter-spacing: -0.04em;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.8);
         }
         
+        /* Badge: Printed Label style */
         .badge { 
-            font-size: 0.7rem; padding: 6px 12px; border-radius: 20px; 
-            background: rgba(255, 255, 255, 0.05); color: var(--text-primary);
-            border: 1px solid rgba(255,255,255,0.1);
-            font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
-            backdrop-filter: blur(10px);
+            font-size: 0.65rem; padding: 4px 8px; border-radius: 4px; 
+            background: #E0DCD0; color: var(--color-ink-secondary);
+            border: 1px solid rgba(0,0,0,0.05);
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+            box-shadow: 1px 1px 0 rgba(255,255,255,0.6);
         }
-        .badge.new { color: var(--aurora-cyan); border-color: rgba(0, 242, 234, 0.2); background: rgba(0, 242, 234, 0.05); }
+        .badge.new { 
+            background: var(--color-braun-orange); 
+            color: white; 
+            border: 1px solid rgba(0,0,0,0.1);
+            text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 1px 1px 2px rgba(0,0,0,0.15);
+        }
 
         .name { 
-            color: var(--text-secondary); 
-            font-size: 1rem; 
-            font-weight: 400; 
+            color: var(--color-ink-secondary); 
+            font-size: 0.9rem; 
+            font-weight: 500; 
             margin-bottom: 20px;
+            position: relative; z-index: 2;
         }
         
         .card-footer {
-            padding-top: 1.5rem; 
-            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 1rem; 
+            border-top: 1px dotted rgba(0,0,0,0.15); /* 虚线分割 */
             display: flex; justify-content: space-between; 
-            font-size: 0.8rem; color: var(--text-tertiary);
+            font-size: 0.75rem; color: var(--color-ink-tertiary);
             font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            position: relative; z-index: 2;
         }
 
-        /* --- Archive Section Controls --- */
-        .archive-toggle {
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid var(--glass-border); 
-            color: var(--text-secondary);
-            padding: 16px; border-radius: 100px; 
-            cursor: pointer; width: 100%;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-            transition: 0.3s; margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-            font-size: 0.9rem; letter-spacing: 0.5px;
-        }
-        .archive-toggle:hover { background: rgba(255,255,255,0.08); color: white; border-color: rgba(255,255,255,0.2); }
-
-        #archive-container { display: none; animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- Buttons --- */
+        /* --- Buttons: Physical Tactile Buttons --- */
         .btn { 
-            padding: 12px 24px; border-radius: 100px; font-weight: 500; cursor: pointer; border: none; 
-            font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
-            font-family: 'SF Pro Display', sans-serif;
+            padding: 10px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; 
+            font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
+            font-family: 'Inter', sans-serif; letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
+        
+        /* Primary Action: Orange Switch */
         .btn-primary { 
-            background: rgba(255,255,255,0.1); 
+            background: var(--color-braun-orange); 
             color: white; 
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+            border: 1px solid #D95A00;
+            box-shadow: 
+                0 2px 5px rgba(0,0,0,0.15), 
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            text-shadow: 0 -1px 0 rgba(0,0,0,0.1);
         }
         .btn-primary:hover { 
-            background: white; color: black; 
-            box-shadow: 0 0 30px rgba(255,255,255,0.4);
+            background: #FF7A1A; 
+            transform: translateY(-1px);
+        }
+        .btn-primary:active {
+            transform: translateY(1px);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* --- Save Bar (Floating Capsule) --- */
+        /* Archive Toggle: Long Mechanical Bar */
+        .archive-toggle {
+            background: var(--color-module); 
+            border: 1px solid #D1CDC0;
+            color: var(--color-ink-secondary);
+            padding: 14px; border-radius: 8px; 
+            cursor: pointer; width: 100%;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: 0.2s; margin-bottom: 30px;
+            font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
+            box-shadow: var(--shadow-raised);
+        }
+        .archive-toggle:hover { 
+            background: #F0EDE5; 
+            color: var(--color-braun-orange);
+            transform: translateY(-1px);
+        }
+        .archive-toggle:active {
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1);
+            transform: translateY(1px);
+        }
+
+        #archive-container { display: none; margin-top: 20px;}
+
+        /* --- Save Bar: Physical Control Strip --- */
         .save-bar {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(150px);
-            background: rgba(16, 185, 129, 0.15); 
-            backdrop-filter: blur(30px) saturate(150%);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #6ee7b7; padding: 12px 24px; border-radius: 100px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 100;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px);
+            background: #333333; /* Dark Contrast Strip */
+            border: 2px solid #222;
+            color: white; padding: 12px 20px; border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 100;
             display: flex; align-items: center; gap: 20px; font-weight: 500;
             transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
         .save-bar.visible { transform: translateX(-50%) translateY(0); }
+        
         .save-bar button {
-            background: #10b981; color: black; border-radius: 20px; padding: 8px 16px; font-weight: 600;
+            background: var(--color-braun-orange); 
+            color: white; border-radius: 4px; padding: 6px 14px; 
+            font-weight: 700; font-size: 0.8rem; text-transform: uppercase;
+            border: none; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
         }
-        .save-bar button:hover { background: #34d399; }
+        .save-bar button:hover { background: #FF8533; }
 
-        /* --- Modal (Spatial Window) --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); z-index: 200; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        /* --- Modal: Floating Control Box --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: grayscale(100%) blur(2px); z-index: 200; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.open { display: flex !important; opacity: 1; }
         
         .modal { 
-            background: rgba(30, 30, 35, 0.6);
-            backdrop-filter: blur(50px) saturate(150%);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--color-chassis);
+            border: 2px solid #D1CDC0;
+            /* 强烈的物理阴影 */
             box-shadow: 
-                inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
-                0 40px 80px rgba(0,0,0,0.8);
-            width: 440px; padding: 40px; border-radius: 40px; 
-            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                0 20px 50px rgba(0,0,0,0.3),
+                inset 1px 1px 0 rgba(255,255,255,0.8);
+            width: 440px; padding: 40px; border-radius: 16px; 
+            transform: scale(0.95); transition: transform 0.2s;
         }
         .modal-overlay.open .modal { transform: scale(1); }
 
-        .modal h3 { font-weight: 300; font-size: 1.8rem; margin-bottom: 2rem; text-align: center; }
+        .modal h3 { 
+            font-weight: 700; font-size: 1.2rem; margin-bottom: 2rem; text-align: center; 
+            text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink);
+            border-bottom: 2px solid var(--color-braun-orange);
+            display: inline-block; padding-bottom: 5px;
+            width: 100%;
+        }
 
         .input-group { margin-bottom: 1.5rem; }
-        .input-group label { display: block; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.8rem; margin-left: 10px;}
-        .input-group input { 
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); 
-            padding: 16px 20px; border-radius: 16px; color: white; font-size: 1rem; outline: none; transition: 0.3s;
+        .input-group label { 
+            display: block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; 
+            text-transform: uppercase; color: var(--color-ink-secondary); margin-bottom: 0.8rem; margin-left: 2px;
         }
-        .input-group input:focus { border-color: var(--aurora-cyan); background: rgba(0,0,0,0.5); box-shadow: 0 0 20px rgba(0, 242, 234, 0.1); }
+        .input-group input { 
+            width: 100%; 
+            background: var(--color-well); 
+            border: none;
+            box-shadow: var(--shadow-well);
+            padding: 14px 16px; border-radius: 6px; 
+            color: var(--color-ink); font-size: 1rem; outline: none; transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .input-group input:focus { 
+            background: #D4D1C6; 
+            color: black;
+        }
+
+        /* SVG Icon Colors overrides */
+        .archive-toggle svg, .card-action-btn svg { stroke-width: 2.5; }
 
     </style>
 </head>
 <body>
 
-    <!-- 1. 动态环境光场 -->
-    <div class="ambient-field">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-
     <header>
         <div class="brand">
-            <div class="section-label">Spatial Research Terminal</div>
-            <div class="logo">投资分析</div>
+            <div class="section-label">System Dashboard</div>
+            <div class="logo">Investment Research</div>
         </div>
-        <input type="text" class="search-box" id="searchInput" placeholder="Search active coverage..." onkeyup="filterGrid()">
+        <input type="text" class="search-box" id="searchInput" placeholder="Search Filter..." onkeyup="filterGrid()">
     </header>
 
     <main>
         <div class="controls">
             <div>
-                <span class="section-label">Overview</span>
-                <div class="subtitle">Tracking <span id="active-count" style="color:white; font-weight:600;">3</span> active assets in portfolio</div>
+                <span class="section-label">Status Overview</span>
+                <div class="subtitle">Tracking <span id="active-count" style="font-weight:700;">3</span> assets in module</div>
             </div>
             <button class="btn btn-primary" onclick="window.openModal()">
-                <span style="font-size:1.2em; line-height:0;">+</span> New Analysis
+                <span style="font-size:1.1em; line-height:0; margin-bottom:2px;">+</span> New Analysis
             </button>
         </div>
 
-        <div class="section-title">Active Coverage</div>
+        <div class="section-title">Active Modules</div>
         
-        <!-- Grid 容器 -->
         <div class="grid" id="active-grid">
-                <div class="card-wrapper">
-                    <button class="card-action-btn" onclick="window.archiveCard(this)" title="Archive">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
-                    </button>
-                    <a href="googl.html" class="card" data-ticker="GOOGL" data-name="Google">
-                        <div class="card-header">
-                            <div class="ticker">GOOGL</div>
-                            <span class="badge new">New</span>
-                        </div>
-                        <div class="name">Google</div>
-                        <div class="card-footer">
-                            <span>STATUS: INIT</span>
-                            <span>NOV 22, 2025</span>
-                        </div>
-                    </a>
-                </div>
             
-            <!-- 示例卡片 1: TCOM -->
             <div class="card-wrapper">
                 <button class="card-action-btn" onclick="window.archiveCard(this)" title="Archive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                </button>
+                <a href="googl.html" class="card" data-ticker="GOOGL" data-name="Google">
+                    <div class="card-header">
+                        <div class="ticker">GOOGL</div>
+                        <span class="badge new">New</span>
+                    </div>
+                    <div class="name">Alphabet Inc.</div>
+                    <div class="card-footer">
+                        <span>INITIATED</span>
+                        <span>NOV 22, 2025</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="card-wrapper">
+                <button class="card-action-btn" onclick="window.archiveCard(this)" title="Archive">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
                 </button>
                 <a href="TCOM.html" class="card" data-ticker="TCOM" data-name="TCOM Group">
                     <div class="card-header">
@@ -383,25 +435,24 @@
                     </div>
                     <div class="name">Trip.com Group</div>
                     <div class="card-footer">
-                        <span>STATUS: BULLISH</span>
+                        <span>BULLISH</span>
                         <span>NOV 21, 2025</span>
                     </div>
                 </a>
             </div>
 
-            <!-- 示例卡片 2: MNSO -->
             <div class="card-wrapper">
                 <button class="card-action-btn" onclick="window.archiveCard(this)" title="Archive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
                 </button>
                 <a href="MNSO.html" class="card" data-ticker="MNSO" data-name="Miniso Group">
                     <div class="card-header">
                         <div class="ticker">MNSO</div>
                         <span class="badge">Active</span>
                     </div>
-                    <div class="name">Miniso Group / 名创优品</div>
+                    <div class="name">Miniso Group</div>
                     <div class="card-footer">
-                        <span>STATUS: HOLD</span>
+                        <span>HOLD</span>
                         <span>NOV 21, 2025</span>
                     </div>
                 </a>
@@ -411,36 +462,33 @@
 
         <button class="archive-toggle" onclick="window.toggleArchives()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Access Archived Reports (<span id="archive-count">0</span>)
+            Show Archived Modules (<span id="archive-count">0</span>)
         </button>
 
-        <div id="archive-container" class="archive-zone" style="display: none;">
-            <div class="section-title">Historical Data</div>
+        <div id="archive-container" class="archive-zone">
+            <div class="section-title">Historical Records</div>
             <div class="grid" id="archive-grid">
-                <!-- Archived cards go here -->
-            </div>
+                </div>
         </div>
 
     </main>
 
-    <!-- Floating Save Bar -->
     <div class="save-bar" id="saveBar">
-        <span style="font-size: 0.9rem;">System State Modified</span>
-        <button class="btn" onclick="window.downloadNewIndex()">
-            Update Index
+        <span style="font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">System State Modified</span>
+        <button onclick="window.downloadNewIndex()">
+            Save Index
         </button>
     </div>
 
-    <!-- Spatial Modal -->
     <div class="modal-overlay" id="modal">
         <div class="modal">
-            <h3>Initialize Report</h3>
-            <div class="input-group"><label>Ticker Symbol</label><input type="text" id="inTicker" placeholder="e.g. BABA" style="text-transform: uppercase; font-family: 'JetBrains Mono';"></div>
-            <div class="input-group"><label>Entity Name</label><input type="text" id="inName" placeholder="e.g. Alibaba Group"></div>
-            <div class="input-group"><label>Source File</label><input type="text" id="inFile" placeholder="e.g. baba_q3.html"></div>
+            <h3>Initialize Module</h3>
+            <div class="input-group"><label>Ticker Symbol</label><input type="text" id="inTicker" placeholder="E.G. BABA" style="text-transform: uppercase; font-family: 'JetBrains Mono';"></div>
+            <div class="input-group"><label>Entity Name</label><input type="text" id="inName" placeholder="E.G. ALIBABA GROUP"></div>
+            <div class="input-group"><label>Source File</label><input type="text" id="inFile" placeholder="FILE_PATH.HTML"></div>
             <div style="display: flex; justify-content: center; gap: 15px; margin-top: 3rem;">
-                <button class="btn" style="background:transparent; color:var(--text-secondary);" onclick="window.closeModal()">Cancel</button>
-                <button class="btn btn-primary" style="background: white; color: black;" onclick="window.addItem()">Initialize</button>
+                <button class="btn" style="background:transparent; color:var(--color-ink-secondary); border: 1px solid transparent;" onclick="window.closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="window.addItem()">Initialize</button>
             </div>
         </div>
     </div>
@@ -474,7 +522,8 @@
 
             window.archiveCard = function(btn) {
                 const wrapper = btn.closest('.card-wrapper');
-                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>`;
+                // Updated Icon for Restore
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>`;
                 btn.setAttribute('title', 'Restore');
                 btn.setAttribute('onclick', 'window.restoreCard(this)');
                 archiveGrid.appendChild(wrapper);
@@ -484,7 +533,8 @@
 
             window.restoreCard = function(btn) {
                 const wrapper = btn.closest('.card-wrapper');
-                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>`;
+                // Updated Icon for Archive
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>`;
                 btn.setAttribute('title', 'Archive');
                 btn.setAttribute('onclick', 'window.archiveCard(this)');
                 activeGrid.appendChild(wrapper);
@@ -506,18 +556,18 @@
                 let file = document.getElementById('inFile').value;
 
                 if(!ticker || !file) {
-                    alert("Please input Ticker and Filename");
+                    alert("Input Required");
                     return;
                 }
                 if(!file.includes('.')) file += '.html';
 
                 const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}).toUpperCase();
 
-                // Updated Tahoe Style Card Template
+                // Updated Braun Style Card Template
                 const newCardHTML = `
                 <div class="card-wrapper">
                     <button class="card-action-btn" onclick="window.archiveCard(this)" title="Archive">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
                     </button>
                     <a href="${file}" class="card" data-ticker="${ticker}" data-name="${name}">
                         <div class="card-header">
@@ -526,7 +576,7 @@
                         </div>
                         <div class="name">${name}</div>
                         <div class="card-footer">
-                            <span>STATUS: INIT</span>
+                            <span>INITIATED</span>
                             <span>${date}</span>
                         </div>
                     </a>
@@ -580,7 +630,7 @@
 
                 const btn = saveBar.querySelector('button');
                 const originalText = btn.innerText;
-                btn.innerText = "✅ Saved!";
+                btn.innerText = "SAVED";
                 setTimeout(() => { btn.innerText = originalText; saveBar.classList.remove('visible'); }, 3000);
             };
 
@@ -590,4 +640,5 @@
         });
     </script>
 
-</body></html>
+</body>
+</html>
